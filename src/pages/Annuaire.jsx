@@ -40,7 +40,7 @@ export default function Annuaire() {
               placeholder="Rechercher une association, un domaine..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none"
+              className="w-full pl-12 pr-4 py-4 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none bg-white"
             />
           </div>
         </div>

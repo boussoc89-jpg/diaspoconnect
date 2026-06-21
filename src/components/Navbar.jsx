@@ -83,19 +83,21 @@ export default function Navbar() {
                 {!user ? (
                   <>
                     <Link
-                      to="/login"
-                      onClick={() => setOpen(false)}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Se connecter
-                    </Link>
-                    <Link
-                      to="/login"
-                      onClick={() => { setOpen(false) }}
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Créer un compte
-                    </Link>
+  to="/login"
+  state={{ mode: 'login' }}
+  onClick={() => setOpen(false)}
+  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+>
+  Se connecter
+</Link>
+<Link
+  to="/login"
+  state={{ mode: 'register' }}
+  onClick={() => setOpen(false)}
+  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+>
+  Créer un compte
+</Link>
                     <Link
                       to="/admin"
                       onClick={() => setOpen(false)}

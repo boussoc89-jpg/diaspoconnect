@@ -8,6 +8,7 @@ import Carte from './pages/Carte'
 import Projets from './pages/Projets'
 import Benevolat from './pages/Benevolat'
 import Login from './pages/Login'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/projets"      element={<Projets />} />
             <Route path="/benevolat"    element={<Benevolat />} />
             <Route path="/login"        element={<Login />} />
+            <Route path="/admin"        element={<Admin />} />
           </Routes>
         </main>
         <Footer />

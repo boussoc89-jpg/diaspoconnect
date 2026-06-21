@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { login, register } from '../services/api'
 
 export default function Login() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState('login') // 'login' | 'register'
+  const location = useLocation()
+  const [mode, setMode] = useState(location.state?.mode || 'login')
   const [role, setRole] = useState('porteur_projet')
   const [form, setForm] = useState({ nom: '', email: '', motDePasse: '' })
   const [showPassword, setShowPassword] = useState(false)

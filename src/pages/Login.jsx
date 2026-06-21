@@ -8,6 +8,7 @@ export default function Login() {
   const [mode, setMode] = useState(location.state?.mode || 'login')
   const [role, setRole] = useState('porteur_projet')
   const [form, setForm] = useState({ nom: '', email: '', motDePasse: '' })
+  const [fichiers, setFichiers] = useState([])
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -112,14 +113,16 @@ export default function Login() {
           </div>
         )}
 
-        {/* Nom (register uniquement) */}
+        {/* Nom — change selon le rôle */}
         {mode === 'register' && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {role === 'association' ? "Nom de l'association" : 'Nom complet'}
+            </label>
             <input
               type="text"
               name="nom"
-              placeholder="Ex: Amadou Diallo"
+              placeholder={role === 'association' ? 'Ex: Teranga France' : 'Ex: Amadou Diallo'}
               value={form.nom}
               onChange={handleChange}
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#2d6a4f]"
@@ -141,7 +144,7 @@ export default function Login() {
         </div>
 
         {/* Mot de passe */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
           <div className="relative">
             <input
@@ -166,6 +169,33 @@ export default function Login() {
           )}
         </div>
 
+        {/* Documents de vérification (association uniquement) */}
+        {mode === 'register' && role === 'association' && (
+          <div className="mb-4">
+            <div className="border border-dashed border-gray-300 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-lg">⬆️</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">Documents de vérification</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Récépissé légal + pièce d'identité du responsable (pour badge Vérifiée)</p>
+                  <label className="mt-2 inline-block cursor-pointer border border-gray-300 text-gray-600 text-xs px-4 py-1.5 rounded-full hover:bg-gray-50 transition">
+                    Sélectionner les fichiers
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => setFichiers([...fichiers, ...e.target.files])}
+                    />
+                  </label>
+                  {fichiers.length > 0 && (
+                    <p className="text-xs text-green-600 mt-1">{fichiers.length} fichier(s) sélectionné(s)</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Erreur */}
         {error && (
           <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
@@ -177,13 +207,13 @@ export default function Login() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-[#2d6a4f] hover:bg-[#245a42] text-white font-semibold py-3 rounded-xl transition disabled:opacity-60"
+          className="w-full bg-[#2d6a4f] hover:bg-[#245a42] text-white font-semibold py-3 rounded-xl transition disabled:opacity-60 mb-4"
         >
           {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
         </button>
 
         {/* Mentions */}
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs text-gray-400">
           En continuant, vous acceptez nos{' '}
           <a href="#" className="text-[#2d6a4f] hover:underline">Conditions d'utilisation</a>{' '}
           et notre{' '}

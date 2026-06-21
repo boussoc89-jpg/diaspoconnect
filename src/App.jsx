@@ -7,6 +7,7 @@ import AssociationProfile from './pages/AssociationProfile'
 import Carte from './pages/Carte'
 import Projets from './pages/Projets'
 import Benevolat from './pages/Benevolat'
+import Login from './pages/Login'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/carte"        element={<Carte />} />
             <Route path="/projets"      element={<Projets />} />
             <Route path="/benevolat"    element={<Benevolat />} />
+            <Route path="/login"        element={<Login />} />
           </Routes>
         </main>
         <Footer />

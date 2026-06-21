@@ -40,10 +40,10 @@ export default function Login() {
   }
 
   const roles = [
-    { value: 'porteur_projet', icon: '🌱', label: 'Porteur de projet', desc: "J'ai un besoin ou projet à financer" },
-    { value: 'association', icon: '🤝', label: 'Association', desc: 'Je représente une association diaspora' },
-    { value: 'benevole', icon: '💪', label: 'Bénévole', desc: 'Je veux offrir mes compétences' },
-  ]
+  { value: 'porteur', icon: '🌱', label: 'Porteur de projet', desc: "J'ai un besoin ou projet à financer" },
+  { value: 'association', icon: '🤝', label: 'Association', desc: 'Je représente une association diaspora' },
+  { value: 'visiteur', icon: '💪', label: 'Bénévole', desc: 'Je veux offrir mes compétences' },
+]
 
   return (
     <div className="min-h-screen bg-[#f5f3ee] flex items-center justify-center px-4">

@@ -9,6 +9,7 @@ import Projets from './pages/Projets'
 import Benevolat from './pages/Benevolat'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
+import PublierProjet from './pages/PublierProjet'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/benevolat"    element={<Benevolat />} />
             <Route path="/login"        element={<Login />} />
             <Route path="/admin"        element={<Admin />} />
+            <Route path="/publier"      element={<PublierProjet />} />
           </Routes>
         </main>
         <Footer />

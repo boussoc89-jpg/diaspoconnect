@@ -6,7 +6,7 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const [mode, setMode] = useState(location.state?.mode || 'login')
-  const [role, setRole] = useState('porteur_projet')
+  const [role, setRole] = useState('porteur')
   const [form, setForm] = useState({ nom: '', email: '', motDePasse: '' })
   const [fichiers, setFichiers] = useState([])
   const [showPassword, setShowPassword] = useState(false)

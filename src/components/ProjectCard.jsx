@@ -10,19 +10,37 @@ const DOMAIN_COLORS = {
   Entrepreneuriat:'bg-yellow-600',
 }
 
+const DOMAIN_EMOJIS = {
+  Éducation:      '📚',
+  Santé:          '🏥',
+  Agriculture:    '🌾',
+  Environnement:  '🌿',
+  Culture:        '🎭',
+  Sport:          '⚽',
+  Entrepreneuriat:'💼',
+}
+
 export default function ProjectCard({ projet }) {
-  const pct = Math.round((projet.montant_collecte / projet.montant_objectif) * 100)
+  const montantCollecte = parseFloat(projet.montant_collecte) || 0
+  const montantObjectif = parseFloat(projet.montant_objectif) || 1
+  const pct = Math.round((montantCollecte / montantObjectif) * 100)
   const domainColor = DOMAIN_COLORS[projet.domaine] || 'bg-gray-500'
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {/* Image */}
+      {/* Image ou placeholder */}
       <div className="relative h-48">
-        <img
-          src={projet.image}
-          alt={projet.titre}
-          className="w-full h-full object-cover"
-        />
+        {projet.image ? (
+          <img
+            src={projet.image}
+            alt={projet.titre}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-5xl">
+            {DOMAIN_EMOJIS[projet.domaine] || '📋'}
+          </div>
+        )}
         <div className="absolute top-3 left-3 flex gap-2">
           <span className={`text-white text-xs font-semibold px-3 py-1 rounded-full ${domainColor}`}>
             {projet.domaine}
@@ -38,10 +56,12 @@ export default function ProjectCard({ projet }) {
             </span>
           )}
         </div>
-        <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-xs">
-          <MapPin className="w-3 h-3" />
-          {projet.localite}
-        </div>
+        {projet.localite && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-xs bg-black/40 px-2 py-1 rounded-full">
+            <MapPin className="w-3 h-3" />
+            {projet.localite}
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -49,10 +69,10 @@ export default function ProjectCard({ projet }) {
         <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2">{projet.titre}</h3>
         <div className="flex items-center justify-between text-sm mb-1">
           <span className="text-primary font-bold text-base">
-            {projet.montant_collecte.toLocaleString('fr-FR')} €
+            {montantCollecte.toLocaleString('fr-FR')} €
           </span>
           <span className="text-gray-500">
-            {pct}% — objectif {projet.montant_objectif.toLocaleString('fr-FR')} €
+            {pct}% — objectif {montantObjectif.toLocaleString('fr-FR')} €
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
@@ -62,7 +82,9 @@ export default function ProjectCard({ projet }) {
           />
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">{projet.donateurs} donateurs</span>
+          <span className="text-gray-500">
+            {projet.donateurs ? `${projet.donateurs} donateurs` : 'Nouveau projet'}
+          </span>
           {projet.jours_restants && (
             <span className="text-red-500 flex items-center gap-1 font-medium">
               <Clock className="w-3.5 h-3.5" />

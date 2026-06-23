@@ -1,20 +1,32 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AssociationCard from '../components/AssociationCard'
-import { associations } from '../data/mockData'
 
 const DOMAINES = ['Éducation', 'Santé', 'Agriculture', 'Entrepreneuriat', 'Environnement', 'Culture', 'Sport']
 const BADGES   = ['Certifiée', 'Vérifiée', 'Membre']
 const PAYS     = ['Tous les pays', 'France', 'Italie', 'États-Unis', 'Espagne', 'Belgique']
-
 const BADGE_ICON = { Certifiée: '🥇', Vérifiée: '🥈', Membre: '🥉' }
 
+const API_URL = 'https://diaspoconnect-backend.onrender.com/api'
+
 export default function Annuaire() {
-  const [search,      setSearch]      = useState('')
-  const [domaine,     setDomaine]     = useState([])
-  const [badge,       setBadge]       = useState([])
-  const [pays,        setPays]        = useState('Tous les pays')
-  const [showFilters, setShowFilters] = useState(false)
+  const [associations, setAssociations] = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [search, setSearch]             = useState('')
+  const [domaine, setDomaine]           = useState([])
+  const [badge, setBadge]               = useState([])
+  const [pays, setPays]                 = useState('Tous les pays')
+  const [showFilters, setShowFilters]   = useState(false)
+
+  useEffect(() => {
+    fetch(`${API_URL}/associations`)
+      .then(r => r.json())
+      .then(data => {
+        setAssociations(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
   const toggleDomaine = (d) =>
     setDomaine(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d])
@@ -31,10 +43,11 @@ export default function Annuaire() {
   const hasFilters = domaine.length > 0 || badge.length > 0 || pays !== 'Tous les pays'
 
   const filtered = associations.filter(a => {
-    const matchSearch  = a.nom.toLowerCase().includes(search.toLowerCase()) ||
-                         a.description.toLowerCase().includes(search.toLowerCase())
-    const matchDomaine = domaine.length === 0 || domaine.some(d => a.domaines.includes(d))
-    const matchBadge   = badge.length === 0   || badge.includes(a.badge)
+    const domainesArray = a.domaines ? a.domaines.split(',').map(d => d.trim()) : []
+    const matchSearch  = a.nom?.toLowerCase().includes(search.toLowerCase()) ||
+                         a.description?.toLowerCase().includes(search.toLowerCase())
+    const matchDomaine = domaine.length === 0 || domaine.some(d => domainesArray.includes(d))
+    const matchBadge   = badge.length === 0 || badge.includes(a.badge)
     const matchPays    = pays === 'Tous les pays' || a.pays === pays
     return matchSearch && matchDomaine && matchBadge && matchPays
   })
@@ -51,7 +64,7 @@ export default function Annuaire() {
             Associations de la diaspora
           </h1>
           <p className="text-white/70 mb-8">
-            {associations.length} associations vérifiées — trouvez votre partenaire solidaire
+            {loading ? 'Chargement...' : `${associations.length} associations vérifiées — trouvez votre partenaire solidaire`}
           </p>
           <div className="relative max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -70,7 +83,6 @@ export default function Annuaire() {
       <section className="py-10 px-6 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto">
 
-          {/* Barre filtres */}
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -91,12 +103,9 @@ export default function Annuaire() {
             <span className="text-gray-500 text-sm">{filtered.length} résultats</span>
           </div>
 
-          {/* Panneau filtres */}
           {showFilters && (
             <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100">
               <div className="grid md:grid-cols-3 gap-8">
-
-                {/* Domaines */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Domaines d'action</h3>
                   <div className="flex flex-wrap gap-2">
@@ -116,7 +125,6 @@ export default function Annuaire() {
                   </div>
                 </div>
 
-                {/* Badges */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Badge de vérification</h3>
                   <div className="flex flex-col gap-2">
@@ -136,7 +144,6 @@ export default function Annuaire() {
                   </div>
                 </div>
 
-                {/* Pays */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Pays d'implantation</h3>
                   <select
@@ -146,8 +153,6 @@ export default function Annuaire() {
                   >
                     {PAYS.map(p => <option key={p}>{p}</option>)}
                   </select>
-
-                  {/* Reset */}
                   {hasFilters && (
                     <button
                       onClick={resetFilters}
@@ -161,8 +166,9 @@ export default function Annuaire() {
             </div>
           )}
 
-          {/* Grille */}
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-20 text-gray-400">Chargement des associations...</div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-20 text-gray-400">Aucune association trouvée.</div>
           ) : (
             <div className="grid md:grid-cols-2 gap-5">

@@ -1,20 +1,32 @@
 import { Search, AlertTriangle } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import { projets } from '../data/mockData'
 
 const DOMAINES = ['Tous', 'Éducation', 'Santé', 'Agriculture', 'Environnement', 'Culture', 'Sport']
 const REGIONS  = ['Toutes les régions', 'Dakar', 'Kaolack', 'Saint-Louis', 'Matam', 'Kolda', 'Ziguinchor']
+const API_URL  = 'https://diaspoconnect-backend.onrender.com/api'
 
 export default function Projets() {
+  const [projets,    setProjets]    = useState([])
+  const [loading,    setLoading]    = useState(true)
   const [search,     setSearch]     = useState('')
   const [domaine,    setDomaine]    = useState('Tous')
   const [region,     setRegion]     = useState('Toutes les régions')
   const [urgentOnly, setUrgentOnly] = useState(false)
 
+  useEffect(() => {
+    fetch(`${API_URL}/projets`)
+      .then(r => r.json())
+      .then(data => {
+        setProjets(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
   const filtered = projets.filter(p => {
-    const matchSearch  = p.titre.toLowerCase().includes(search.toLowerCase()) ||
-                         p.localite.toLowerCase().includes(search.toLowerCase())
+    const matchSearch  = p.titre?.toLowerCase().includes(search.toLowerCase()) ||
+                         p.localite?.toLowerCase().includes(search.toLowerCase())
     const matchDomaine = domaine === 'Tous' || p.domaine === domaine
     const matchRegion  = region === 'Toutes les régions' || p.region === region
     const matchUrgent  = !urgentOnly || p.urgent
@@ -36,7 +48,7 @@ export default function Projets() {
             Tous les projets
           </h1>
           <p className="text-white/70 mb-8">
-            {projets.length} projets publiés sur la plateforme
+            {loading ? 'Chargement...' : `${projets.length} projets publiés sur la plateforme`}
           </p>
           <div className="relative max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -54,6 +66,7 @@ export default function Projets() {
       {/* Contenu */}
       <section className="py-10 px-6 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto">
+
           {/* Filtres */}
           <div className="flex items-center gap-3 mb-6 flex-wrap">
             <button
@@ -85,30 +98,34 @@ export default function Projets() {
             </span>
           </div>
 
-          {/* Projets urgents */}
-          {urgents.length > 0 && (
-            <div className="mb-10">
-              <span className="inline-flex items-center gap-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
-                ⚠ PROJETS URGENTS
-              </span>
-              <div className="grid md:grid-cols-2 gap-5">
-                {urgents.map(p => <ProjectCard key={p.id} projet={p} />)}
-              </div>
-            </div>
-          )}
+          {loading ? (
+            <div className="text-center py-20 text-gray-400">Chargement des projets...</div>
+          ) : (
+            <>
+              {urgents.length > 0 && (
+                <div className="mb-10">
+                  <span className="inline-flex items-center gap-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
+                    ⚠ PROJETS URGENTS
+                  </span>
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {urgents.map(p => <ProjectCard key={p.id} projet={p} />)}
+                  </div>
+                </div>
+              )}
 
-          {/* Autres projets */}
-          {nonUrgents.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-5">Autres projets</h2>
-              <div className="grid md:grid-cols-2 gap-5">
-                {nonUrgents.map(p => <ProjectCard key={p.id} projet={p} />)}
-              </div>
-            </div>
-          )}
+              {nonUrgents.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-700 mb-5">Autres projets</h2>
+                  <div className="grid md:grid-cols-2 gap-5">
+                    {nonUrgents.map(p => <ProjectCard key={p.id} projet={p} />)}
+                  </div>
+                </div>
+              )}
 
-          {filtered.length === 0 && (
-            <div className="text-center py-20 text-gray-400">Aucun projet trouvé.</div>
+              {filtered.length === 0 && (
+                <div className="text-center py-20 text-gray-400">Aucun projet trouvé.</div>
+              )}
+            </>
           )}
         </div>
       </section>

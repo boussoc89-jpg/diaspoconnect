@@ -16,7 +16,6 @@ export default function Navbar() {
   const navigate = useNavigate()
   const user = getUser()
 
-  // Fermer le dropdown si on clique en dehors
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -68,7 +67,6 @@ export default function Navbar() {
             Publier un projet
           </Link>
 
-          {/* Bouton Connexion avec dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setOpen(!open)}
@@ -83,37 +81,39 @@ export default function Navbar() {
                 {!user ? (
                   <>
                     <Link
-  to="/login"
-  state={{ mode: 'login' }}
-  onClick={() => setOpen(false)}
-  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
->
-  Se connecter
-</Link>
-<Link
-  to="/login"
-  state={{ mode: 'register' }}
-  onClick={() => setOpen(false)}
-  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
->
-  Créer un compte
-</Link>
-                    <Link
-                      to="/admin"
+                      to="/login"
+                      state={{ mode: 'login' }}
                       onClick={() => setOpen(false)}
-                      className="block px-4 py-2.5 text-sm text-[#2d6a4f] hover:bg-gray-50"
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                     >
-                      Admin (démo)
+                      Se connecter
+                    </Link>
+                    <Link
+                      to="/login"
+                      state={{ mode: 'register' }}
+                      onClick={() => setOpen(false)}
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Créer un compte
                     </Link>
                   </>
                 ) : (
                   <>
+                    {user.role === 'admin' && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setOpen(false)}
+                        className="block px-4 py-2.5 text-sm text-[#2d6a4f] font-semibold hover:bg-gray-50"
+                      >
+                        🛡️ Administration
+                      </Link>
+                    )}
                     <Link
-                      to="/admin"
+                      to="/dashboard"
                       onClick={() => setOpen(false)}
                       className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                     >
-                      Dashboard
+                      Mes projets
                     </Link>
                     <button
                       onClick={handleLogout}

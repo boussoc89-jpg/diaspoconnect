@@ -10,6 +10,7 @@ import Benevolat from './pages/Benevolat'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
 import PublierProjet from './pages/PublierProjet'
+import Dashboard from './pages/Dashboard'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/login"        element={<Login />} />
             <Route path="/admin"        element={<Admin />} />
             <Route path="/publier"      element={<PublierProjet />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </main>
         <Footer />

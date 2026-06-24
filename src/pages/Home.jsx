@@ -1,12 +1,29 @@
 import { Users, Heart, Globe, TrendingUp, ArrowRight, MapPin, UserCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import AssociationCard from '../components/AssociationCard'
-import { projets, associations } from '../data/mockData'
+
+const API_URL = 'https://diaspoconnect-backend.onrender.com/api'
 
 export default function Home() {
-  const urgents   = projets.filter(p => p.urgent)
-  const enCours   = projets.filter(p => !p.urgent && p.statut !== 'Financé')
+  const [projets, setProjets] = useState([])
+  const [associations, setAssociations] = useState([])
+
+  useEffect(() => {
+    fetch(`${API_URL}/projets`)
+      .then(r => r.json())
+      .then(data => setProjets(Array.isArray(data) ? data : []))
+      .catch(() => {})
+
+    fetch(`${API_URL}/associations`)
+      .then(r => r.json())
+      .then(data => setAssociations(Array.isArray(data) ? data : []))
+      .catch(() => {})
+  }, [])
+
+  const urgents    = projets.filter(p => p.urgent)
+  const enCours    = projets.filter(p => !p.urgent && p.statut !== 'Financé')
   const certifiees = associations.filter(a => a.badge === 'Certifiée')
 
   return (
@@ -45,7 +62,7 @@ export default function Home() {
       <section className="bg-primary py-12">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { icon: Users,      value: '247+',   label: 'Associations' },
+            { icon: Users,      value: `${associations.length || 0}+`, label: 'Associations' },
             { icon: Heart,      value: '4.3M €', label: 'Fonds mobilisés' },
             { icon: Globe,      value: '18',     label: 'Pays représentés' },
             { icon: TrendingUp, value: '142k+',  label: 'Bénéficiaires' },
@@ -60,21 +77,23 @@ export default function Home() {
       </section>
 
       {/* Projets urgents */}
-      <section className="py-14 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <span className="inline-flex items-center gap-2 bg-red-500 text-white font-semibold px-4 py-2 rounded-full text-sm">
-              ⚠ Projets urgents
-            </span>
-            <Link to="/projets" className="text-primary font-medium hover:underline text-sm">
-              Voir tous
-            </Link>
+      {urgents.length > 0 && (
+        <section className="py-14 px-6 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <span className="inline-flex items-center gap-2 bg-red-500 text-white font-semibold px-4 py-2 rounded-full text-sm">
+                ⚠ Projets urgents
+              </span>
+              <Link to="/projets" className="text-primary font-medium hover:underline text-sm">
+                Voir tous
+              </Link>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {urgents.slice(0, 2).map(p => <ProjectCard key={p.id} projet={p} />)}
+            </div>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {urgents.slice(0, 2).map(p => <ProjectCard key={p.id} projet={p} />)}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Comment ça marche */}
       <section className="py-16 px-6 bg-white">
@@ -118,33 +137,56 @@ export default function Home() {
       </section>
 
       {/* Associations certifiées */}
-      <section className="py-14 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">Mises en avant</p>
-            <Link to="/annuaire" className="text-primary text-sm font-medium hover:underline">
-              Voir tout l'annuaire
-            </Link>
+      {certifiees.length > 0 && (
+        <section className="py-14 px-6 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">Mises en avant</p>
+              <Link to="/annuaire" className="text-primary text-sm font-medium hover:underline">
+                Voir tout l'annuaire
+              </Link>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Associations Certifiées 🥇</h2>
+            <div className="grid md:grid-cols-2 gap-5">
+              {certifiees.map(a => <AssociationCard key={a.id} asso={a} />)}
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Associations Certifiées 🥇</h2>
-          <div className="grid md:grid-cols-2 gap-5">
-            {certifiees.map(a => <AssociationCard key={a.id} asso={a} />)}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Projets à soutenir */}
-      <section className="py-14 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">En cours</p>
-            <Link to="/projets" className="text-primary text-sm font-medium hover:underline">
-              Tous les projets
-            </Link>
+      {enCours.length > 0 && (
+        <section className="py-14 px-6 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">En cours</p>
+              <Link to="/projets" className="text-primary text-sm font-medium hover:underline">
+                Tous les projets
+              </Link>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Projets à soutenir</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {enCours.slice(0, 2).map(p => <ProjectCard key={p.id} projet={p} />)}
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Projets à soutenir</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {enCours.slice(0, 2).map(p => <ProjectCard key={p.id} projet={p} />)}
+        </section>
+      )}
+
+      {/* CTA */}
+      <section className="hero-pattern py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">SN</p>
+          <h2 className="text-4xl font-bold text-white mb-4">Vous avez un projet pour le Sénégal ?</h2>
+          <p className="text-white/70 mb-8">
+            Publiez votre projet en quelques minutes et connectez-vous avec les associations de la diaspora prêtes à vous soutenir.
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link to="/publier" className="bg-accent text-gray-900 font-semibold px-6 py-3 rounded-full hover:bg-yellow-400 transition-colors">
+              Publier un projet →
+            </Link>
+            <Link to="/login" state={{ mode: 'register' }} className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
+              Inscrire mon association
+            </Link>
           </div>
         </div>
       </section>

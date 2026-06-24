@@ -22,9 +22,9 @@ const DOMAIN_COLORS = {
 }
 
 export default function AssociationCard({ asso }) {
-  const domainesArray = asso.domaines
+  const domainesArray = asso.domaines && typeof asso.domaines === 'string'
     ? asso.domaines.split(',').map(d => d.trim())
-    : []
+    : Array.isArray(asso.domaines) ? asso.domaines : []
 
   const initiale = asso.nom ? asso.nom.charAt(0).toUpperCase() : '?'
 

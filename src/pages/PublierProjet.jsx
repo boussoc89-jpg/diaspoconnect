@@ -28,10 +28,39 @@ export default function PublierProjet() {
       alert('Veuillez remplir tous les champs obligatoires')
       return
     }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      alert('Vous devez être connecté pour publier un projet')
+      navigate('/login')
+      return
+    }
     setLoading(true)
-    // Simulation envoi
-    await new Promise(r => setTimeout(r, 1000))
-    setSuccess(true)
+    try {
+      const res = await fetch('https://diaspoconnect-backend.onrender.com/api/projets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          titre: form.titre,
+          description: form.description,
+          domaine: form.domaine,
+          montant_objectif: parseFloat(form.budget),
+          region: form.region,
+          localite: form.localite,
+          urgent: urgent,
+        })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setSuccess(true)
+      } else {
+        alert(data.message || 'Erreur lors de la publication')
+      }
+    } catch (err) {
+      alert('Erreur de connexion au serveur')
+    }
     setLoading(false)
   }
 

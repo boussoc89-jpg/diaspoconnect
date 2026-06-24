@@ -42,16 +42,10 @@ export default function Home() {
             de projets locaux. Transparence, vérification et impact concret pour chaque soutien.
           </p>
           <div className="flex gap-4 flex-wrap">
-            <Link
-              to="/annuaire"
-              className="bg-accent text-gray-900 font-semibold px-6 py-3 rounded-full hover:bg-yellow-400 transition-colors flex items-center gap-2"
-            >
+            <Link to="/annuaire" className="bg-accent text-gray-900 font-semibold px-6 py-3 rounded-full hover:bg-yellow-400 transition-colors flex items-center gap-2">
               Explorer l'annuaire <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              to="/projets"
-              className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
-            >
+            <Link to="/projets" className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
               Voir les projets
             </Link>
           </div>
@@ -104,24 +98,9 @@ export default function Home() {
           <h2 className="text-4xl font-bold text-gray-900 mb-14">La solidarité en 3 étapes</h2>
           <div className="grid md:grid-cols-3 gap-10">
             {[
-              {
-                icon: UserCheck,
-                step: 'ÉTAPE 01',
-                title: 'Découvrez les associations',
-                desc: "Consultez notre annuaire vérifié d'associations diaspora avec système de badges de confiance.",
-              },
-              {
-                icon: MapPin,
-                step: 'ÉTAPE 02',
-                title: 'Explorez les projets',
-                desc: "Visualisez les projets sur la carte interactive du Sénégal et choisissez ceux qui vous touchent.",
-              },
-              {
-                icon: Heart,
-                step: 'ÉTAPE 03',
-                title: 'Soutenez en toute confiance',
-                desc: "Suivez l'impact de votre soutien avec notre tableau de transparence détaillé.",
-              },
+              { icon: UserCheck, step: 'ÉTAPE 01', title: 'Découvrez les associations', desc: "Consultez notre annuaire vérifié d'associations diaspora avec système de badges de confiance." },
+              { icon: MapPin,    step: 'ÉTAPE 02', title: 'Explorez les projets',       desc: "Visualisez les projets sur la carte interactive du Sénégal et choisissez ceux qui vous touchent." },
+              { icon: Heart,     step: 'ÉTAPE 03', title: 'Soutenez en toute confiance', desc: "Suivez l'impact de votre soutien avec notre tableau de transparence détaillé." },
             ].map(({ icon: Icon, step, title, desc }) => (
               <div key={step} className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-5">
@@ -142,9 +121,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">Mises en avant</p>
-              <Link to="/annuaire" className="text-primary text-sm font-medium hover:underline">
-                Voir tout l'annuaire
-              </Link>
+              <Link to="/annuaire" className="text-primary text-sm font-medium hover:underline">Voir tout l'annuaire</Link>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Associations Certifiées 🥇</h2>
             <div className="grid md:grid-cols-2 gap-5">
@@ -160,9 +137,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase">En cours</p>
-              <Link to="/projets" className="text-primary text-sm font-medium hover:underline">
-                Tous les projets
-              </Link>
+              <Link to="/projets" className="text-primary text-sm font-medium hover:underline">Tous les projets</Link>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Projets à soutenir</h2>
             <div className="grid md:grid-cols-2 gap-6">
@@ -171,25 +146,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
-      {/* CTA */}
-      <section className="hero-pattern py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">SN</p>
-          <h2 className="text-4xl font-bold text-white mb-4">Vous avez un projet pour le Sénégal ?</h2>
-          <p className="text-white/70 mb-8">
-            Publiez votre projet en quelques minutes et connectez-vous avec les associations de la diaspora prêtes à vous soutenir.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link to="/publier" className="bg-accent text-gray-900 font-semibold px-6 py-3 rounded-full hover:bg-yellow-400 transition-colors">
-              Publier un projet →
-            </Link>
-            <Link to="/login" state={{ mode: 'register' }} className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
-              Inscrire mon association
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

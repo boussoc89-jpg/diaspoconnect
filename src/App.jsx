@@ -12,6 +12,7 @@ import Admin from './pages/Admin'
 import PublierProjet from './pages/PublierProjet'
 import Dashboard from './pages/Dashboard'
 import InscriptionAssociation from './pages/InscriptionAssociation'
+import ProjetDetail from './pages/ProjetDetail'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/admin"                 element={<Admin />} />
             <Route path="/publier"               element={<PublierProjet />} />
             <Route path="/dashboard"             element={<Dashboard />} />
+            <Route path="/projets/:id" element={<ProjetDetail />} />
             <Route path="/inscrire-association"  element={<InscriptionAssociation />} />
           </Routes>
         </main>

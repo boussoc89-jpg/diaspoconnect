@@ -1,7 +1,9 @@
 import { ArrowLeft, MapPin, Users, Calendar, Briefcase, Mail, Globe, ExternalLink } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import { associations, projets } from '../data/mockData'
+
+const API_URL = 'https://diaspoconnect-backend.onrender.com/api'
 
 const BADGE_STYLE = {
   Certifiée: 'bg-yellow-100 text-yellow-800 border border-yellow-300',
@@ -12,16 +14,43 @@ const BADGE_ICON = { Certifiée: '🥇', Vérifiée: '🥈', Membre: '🥉' }
 
 export default function AssociationProfile() {
   const { id } = useParams()
-  const asso   = associations.find(a => a.id === Number(id))
+  const [asso, setAsso] = useState(null)
+  const [projets, setProjets] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  if (!asso) return (
+  useEffect(() => {
+    fetch(`${API_URL}/associations/${id}`)
+      .then(r => r.json())
+      .then(data => {
+        setAsso(data)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+
+    fetch(`${API_URL}/projets`)
+      .then(r => r.json())
+      .then(data => setProjets(Array.isArray(data) ? data : []))
+      .catch(() => {})
+  }, [id])
+
+  if (loading) return <div className="text-center py-32 text-gray-400">Chargement...</div>
+
+  if (!asso || asso.message) return (
     <div className="text-center py-32 text-gray-400">
       Association introuvable.{' '}
       <Link to="/annuaire" className="text-primary underline">Retour</Link>
     </div>
   )
 
-  const assoProjets = projets.filter(p => asso.projets.includes(p.id))
+  const domainesArray = asso.domaines && typeof asso.domaines === 'string'
+    ? asso.domaines.split(',').map(d => d.trim())
+    : []
+
+  const regionsArray = asso.regions && typeof asso.regions === 'string'
+    ? asso.regions.split(',').map(r => r.trim())
+    : []
+
+  const assoProjets = projets.filter(p => p.association_id === asso.id)
 
   return (
     <div>
@@ -32,25 +61,32 @@ export default function AssociationProfile() {
             <ArrowLeft className="w-4 h-4" /> Retour à l'annuaire
           </Link>
           <div className="flex items-start gap-5">
-            <img
-              src={asso.image}
-              alt={asso.nom}
-              className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border-2 border-white/30"
-            />
+            {asso.logo ? (
+              <img src={asso.logo} alt={asso.nom}
+                className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border-2 border-white/30" />
+            ) : (
+              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
+                <span className="text-white font-bold text-3xl">{asso.nom?.charAt(0)}</span>
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${BADGE_STYLE[asso.badge]}`}>
-                  {BADGE_ICON[asso.badge]} {asso.badge}
+                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${BADGE_STYLE[asso.badge] || 'bg-gray-100 text-gray-700'}`}>
+                  {BADGE_ICON[asso.badge] || '🥉'} {asso.badge || 'Membre'}
                 </span>
-                <span className="text-white/60 text-sm">Depuis {asso.depuis}</span>
+                {asso.depuis && <span className="text-white/60 text-sm">Depuis {asso.depuis}</span>}
               </div>
               <h1 className="text-4xl font-bold text-white mt-1">{asso.nom}</h1>
               <div className="flex items-center gap-4 mt-2 text-white/70 text-sm flex-wrap">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" />{asso.pays}
                 </span>
-                <span className="text-white/40">→</span>
-                <span>Sénégal : {asso.regions.join(', ')}</span>
+                {regionsArray.length > 0 && (
+                  <>
+                    <span className="text-white/40">→</span>
+                    <span>Sénégal : {regionsArray.join(', ')}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -65,20 +101,20 @@ export default function AssociationProfile() {
           {/* À propos */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-3">À propos</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{asso.description}</p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {asso.domaines.map(d => (
-                <span key={d} className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">{d}</span>
-              ))}
-            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">{asso.description || 'Aucune description disponible.'}</p>
+            {domainesArray.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {domainesArray.map(d => (
+                  <span key={d} className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">{d}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Projets soutenus */}
           {assoProjets.length > 0 && (
             <div>
-              <h2 className="font-semibold text-gray-900 mb-4">
-                Projets soutenus ({assoProjets.length})
-              </h2>
+              <h2 className="font-semibold text-gray-900 mb-4">Projets soutenus ({assoProjets.length})</h2>
               <div className="grid md:grid-cols-2 gap-5">
                 {assoProjets.map(p => <ProjectCard key={p.id} projet={p} />)}
               </div>
@@ -90,7 +126,9 @@ export default function AssociationProfile() {
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h2 className="font-semibold text-gray-900 mb-4">Tableau de transparence</h2>
               {assoProjets.map(p => {
-                const pct = Math.round((p.montant_collecte / p.montant_objectif) * 100)
+                const montantCollecte = parseFloat(p.montant_collecte) || 0
+                const montantObjectif = parseFloat(p.montant_objectif) || 1
+                const pct = Math.round((montantCollecte / montantObjectif) * 100)
                 return (
                   <div key={p.id} className="mb-4 last:mb-0">
                     <div className="flex justify-between text-sm mb-1">
@@ -102,8 +140,8 @@ export default function AssociationProfile() {
                       </span>
                     </div>
                     <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>{p.montant_collecte.toLocaleString('fr-FR')} €</span>
-                      <span>{pct}% — objectif {p.montant_objectif.toLocaleString('fr-FR')} €</span>
+                      <span>{montantCollecte.toLocaleString('fr-FR')} €</span>
+                      <span>{pct}% — objectif {montantObjectif.toLocaleString('fr-FR')} €</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div className="bg-primary h-2 rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
@@ -120,9 +158,9 @@ export default function AssociationProfile() {
           {/* Stats */}
           <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
             {[
-              { icon: Users,     value: asso.membres,          label: 'Membres' },
-              { icon: Briefcase, value: asso.projets_soutenus, label: 'Projets soutenus' },
-              { icon: Calendar,  value: asso.depuis,           label: 'Année de création' },
+              { icon: Users,     value: assoProjets.length || '-', label: 'Projets soutenus' },
+              { icon: Calendar,  value: asso.depuis || '-',        label: 'Année de création' },
+              { icon: Briefcase, value: domainesArray.length || '-', label: 'Domaines d\'action' },
             ].map(({ icon: Icon, value, label }) => (
               <div key={label} className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -139,20 +177,20 @@ export default function AssociationProfile() {
           {/* Contact */}
           <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
             <h3 className="font-semibold text-gray-900">Contact</h3>
-            {asso.email && (
+            {asso.email_public && (
               <div className="flex items-center gap-3 text-sm text-gray-600">
                 <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
                   <Mail className="w-4 h-4" />
                 </div>
-                {asso.email}
+                {asso.email_public}
               </div>
             )}
-            {asso.site && (
+            {asso.site_web && (
               <div className="flex items-center gap-3 text-sm text-gray-600">
                 <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
                   <Globe className="w-4 h-4" />
                 </div>
-                {asso.site}
+                {asso.site_web}
               </div>
             )}
             {asso.facebook && (

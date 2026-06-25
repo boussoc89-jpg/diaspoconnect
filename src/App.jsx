@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import Admin from './pages/Admin'
 import PublierProjet from './pages/PublierProjet'
 import Dashboard from './pages/Dashboard'
+import InscriptionAssociation from './pages/InscriptionAssociation'
 
 export default function App() {
   return (
@@ -19,16 +20,17 @@ export default function App() {
         <Navbar />
         <main className="flex-1">
           <Routes>
-            <Route path="/"             element={<Home />} />
-            <Route path="/annuaire"     element={<Annuaire />} />
-            <Route path="/annuaire/:id" element={<AssociationProfile />} />
-            <Route path="/carte"        element={<Carte />} />
-            <Route path="/projets"      element={<Projets />} />
-            <Route path="/benevolat"    element={<Benevolat />} />
-            <Route path="/login"        element={<Login />} />
-            <Route path="/admin"        element={<Admin />} />
-            <Route path="/publier"      element={<PublierProjet />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/"                      element={<Home />} />
+            <Route path="/annuaire"              element={<Annuaire />} />
+            <Route path="/annuaire/:id"          element={<AssociationProfile />} />
+            <Route path="/carte"                 element={<Carte />} />
+            <Route path="/projets"               element={<Projets />} />
+            <Route path="/benevolat"             element={<Benevolat />} />
+            <Route path="/login"                 element={<Login />} />
+            <Route path="/admin"                 element={<Admin />} />
+            <Route path="/publier"               element={<PublierProjet />} />
+            <Route path="/dashboard"             element={<Dashboard />} />
+            <Route path="/inscrire-association"  element={<InscriptionAssociation />} />
           </Routes>
         </main>
         <Footer />

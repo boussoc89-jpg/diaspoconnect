@@ -188,56 +188,104 @@ export default function Admin() {
           </>
         )}
 
+      
         {/* === VALIDATIONS === */}
-        {onglet === 'validations' && (
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-yellow-500 text-lg">⚠️</span>
-              <h2 className="font-semibold text-gray-800">
-                Demandes d'inscription en attente ({pending.length})
-              </h2>
-            </div>
-            {pending.length === 0 ? (
-              <div className="bg-white rounded-2xl p-10 text-center shadow-sm text-gray-400">
-                Aucune demande en attente
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {pending.map((v, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#2d6a4f] rounded-xl flex items-center justify-center text-white font-bold text-lg">
-                        {v.nom?.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">{v.nom}</p>
-                        <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                          <span>🌍 {v.pays}</span>
-                          <span>📧 {v.email_public || 'Pas d\'email'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleApprouver(v.id)}
-                        className="bg-[#2d6a4f] text-white text-sm px-4 py-2 rounded-full hover:bg-[#245a42] transition"
-                      >
-                        ✓ Approuver
-                      </button>
-                      <button
-                        onClick={() => handleRejeter(v.id)}
-                        className="border border-red-400 text-red-500 text-sm px-4 py-2 rounded-full hover:bg-red-50 transition"
-                      >
-                        ✕ Rejeter
-                      </button>
-                    </div>
+{onglet === 'validations' && (
+  <div>
+    <div className="flex items-center gap-2 mb-4">
+      <span className="text-yellow-500 text-lg">⚠️</span>
+      <h2 className="font-semibold text-gray-800">
+        Demandes d'inscription en attente ({pending.length})
+      </h2>
+    </div>
+    {pending.length === 0 ? (
+      <div className="bg-white rounded-2xl p-10 text-center shadow-sm text-gray-400">
+        Aucune demande en attente
+      </div>
+    ) : (
+      <div className="flex flex-col gap-4">
+        {pending.map((v, i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#2d6a4f] rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                  {v.nom?.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{v.nom}</p>
+                  <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                    <span>🌍 {v.pays || 'Pays non renseigné'}</span>
+                    <span>📧 {v.email_public || 'Email non renseigné'}</span>
+                    {v.depuis && <span>📅 Depuis {v.depuis}</span>}
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
 
+            {/* Détails du dossier */}
+            <div className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
+              {v.description && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Description</p>
+                  <p className="text-sm text-gray-700">{v.description}</p>
+                </div>
+              )}
+              {v.domaines && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Domaines d'action</p>
+                  <div className="flex flex-wrap gap-1">
+                    {v.domaines.split(',').map(d => (
+                      <span key={d} className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">{d.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {v.regions && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Régions d'intervention</p>
+                  <div className="flex flex-wrap gap-1">
+                    {v.regions.split(',').map(r => (
+                      <span key={r} className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{r.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {v.site_web && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Site web</p>
+                    <p className="text-gray-700">{v.site_web}</p>
+                  </div>
+                )}
+                {v.telephone && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Téléphone</p>
+                    <p className="text-gray-700">{v.telephone}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleApprouver(v.id)}
+                className="flex-1 bg-[#2d6a4f] text-white text-sm px-4 py-2 rounded-full hover:bg-[#245a42] transition"
+              >
+                ✓ Approuver
+              </button>
+              <button
+                onClick={() => handleRejeter(v.id)}
+                className="flex-1 border border-red-400 text-red-500 text-sm px-4 py-2 rounded-full hover:bg-red-50 transition"
+              >
+                ✕ Rejeter
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
         {/* === MODÉRATION PROJETS === */}
         {onglet === 'moderation' && (
           <div>

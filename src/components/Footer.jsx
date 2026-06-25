@@ -22,11 +22,11 @@ export default function Footer() {
             Publier un projet →
           </Link>
           <Link
-            to="/annuaire"
-            className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
-          >
-            Inscrire mon association
-          </Link>
+    to="/inscrire-association"
+    className="border border-white text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
+  >
+    Inscrire mon association
+  </Link>
         </div>
       </section>
 

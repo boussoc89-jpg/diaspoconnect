@@ -174,10 +174,30 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="py-3">
-                          <span className="text-xs px-2 py-1 rounded-full border font-medium border-yellow-400 text-yellow-700">
-                            🏅 {a.badge}
-                          </span>
-                        </td>
+  <select
+    value={a.badge}
+    onChange={async (e) => {
+      const res = await fetch(`${API_URL}/associations/${a.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ badge: e.target.value })
+      })
+      if (res.ok) {
+        setAssociations(associations.map(assoc =>
+          assoc.id === a.id ? { ...assoc, badge: e.target.value } : assoc
+        ))
+      }
+    }}
+    className="text-xs px-2 py-1 rounded-full border font-medium border-yellow-400 text-yellow-700 bg-white cursor-pointer"
+  >
+    <option value="Membre">🥉 Membre</option>
+    <option value="Vérifiée">🥈 Vérifiée</option>
+    <option value="Certifiée">🥇 Certifiée</option>
+  </select>
+</td>
                         <td className="py-3 text-gray-700">{a.depuis || '-'}</td>
                       </tr>
                     ))}

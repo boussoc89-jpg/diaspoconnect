@@ -8,20 +8,25 @@ const API_URL = 'https://diaspoconnect-backend.onrender.com/api'
 
 export default function Home() {
   const [projets, setProjets] = useState([])
-  const [associations, setAssociations] = useState([])
+const [associations, setAssociations] = useState([])
+const [stats, setStats] = useState({ associations: 0, fonds: 0, pays: 0, projets: 0 })
 
-  useEffect(() => {
-    fetch(`${API_URL}/projets`)
-      .then(r => r.json())
-      .then(data => setProjets(Array.isArray(data) ? data : []))
-      .catch(() => {})
+useEffect(() => {
+  fetch(`${API_URL}/projets`)
+    .then(r => r.json())
+    .then(data => setProjets(Array.isArray(data) ? data : []))
+    .catch(() => {})
 
-    fetch(`${API_URL}/associations`)
-      .then(r => r.json())
-      .then(data => setAssociations(Array.isArray(data) ? data : []))
-      .catch(() => {})
-  }, [])
+  fetch(`${API_URL}/associations`)
+    .then(r => r.json())
+    .then(data => setAssociations(Array.isArray(data) ? data : []))
+    .catch(() => {})
 
+  fetch(`${API_URL}/stats`)
+    .then(r => r.json())
+    .then(data => setStats(data))
+    .catch(() => {})
+}, [])
   const urgents    = projets.filter(p => p.urgent)
   const enCours    = projets.filter(p => !p.urgent && p.statut !== 'Financé')
   const certifiees = associations.filter(a => a.badge === 'Certifiée')
@@ -56,10 +61,10 @@ export default function Home() {
       <section className="bg-primary py-12">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { icon: Users,      value: `${associations.length || 0}+`, label: 'Associations' },
-            { icon: Heart,      value: '4.3M €', label: 'Fonds mobilisés' },
-            { icon: Globe,      value: '18',     label: 'Pays représentés' },
-            { icon: TrendingUp, value: '142k+',  label: 'Bénéficiaires' },
+            { icon: Users,      value: `${stats.associations}`, label: 'Associations' },
+{ icon: Heart,      value: `${parseFloat(stats.fonds || 0).toLocaleString('fr-FR')} €`, label: 'Fonds mobilisés' },
+{ icon: Globe,      value: `${stats.pays}`,          label: 'Pays représentés' },
+{ icon: TrendingUp, value: `${stats.projets}`,        label: 'Projets publiés' }, 
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="text-white">
               <Icon className="w-7 h-7 text-accent mx-auto mb-2" />

@@ -177,20 +177,24 @@ export default function Admin() {
   <select
     value={a.badge}
     onChange={async (e) => {
-      const res = await fetch(`${API_URL}/associations/${a.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ badge: e.target.value })
-      })
-      if (res.ok) {
-        setAssociations(associations.map(assoc =>
-          assoc.id === a.id ? { ...assoc, badge: e.target.value } : assoc
-        ))
-      }
-    }}
+  const newBadge = e.target.value
+  const res = await fetch(`${API_URL}/associations/${a.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ badge: newBadge })
+  })
+  if (res.ok) {
+    setAssociations(prev => prev.map(assoc =>
+      assoc.id === a.id ? { ...assoc, badge: newBadge } : assoc
+    ))
+    alert(`✅ Badge mis à jour : ${newBadge}`)
+  } else {
+    alert('❌ Erreur lors de la mise à jour')
+  }
+}}
     className="text-xs px-2 py-1 rounded-full border font-medium border-yellow-400 text-yellow-700 bg-white cursor-pointer"
   >
     <option value="Membre">🥉 Membre</option>

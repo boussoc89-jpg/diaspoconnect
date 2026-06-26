@@ -61,10 +61,10 @@ useEffect(() => {
       <section className="bg-primary py-12">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { icon: Users,      value: `${stats.associations}`, label: 'Associations' },
+          { icon: Users,      value: `${stats.associations || 0}`,  label: 'Associations' },
 { icon: Heart,      value: `${parseFloat(stats.fonds || 0).toLocaleString('fr-FR')} €`, label: 'Fonds mobilisés' },
-{ icon: Globe,      value: `${stats.pays}`,          label: 'Pays représentés' },
-{ icon: TrendingUp, value: `${stats.projets}`,        label: 'Projets publiés' }, 
+{ icon: Globe,      value: `${stats.pays || 0}`,           label: 'Pays représentés' },
+{ icon: TrendingUp, value: `${stats.projets || 0}`,        label: 'Projets publiés' },
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="text-white">
               <Icon className="w-7 h-7 text-accent mx-auto mb-2" />

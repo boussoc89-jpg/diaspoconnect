@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Toast from '../components/Toast'
 
 const API_URL = 'https://diaspoconnect-backend.onrender.com/api'
 
@@ -10,8 +11,11 @@ export default function Admin() {
   const [projets, setProjets] = useState([])
   const [pending, setPending] = useState([])
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState(null)
   const user = JSON.parse(localStorage.getItem('user') || 'null')
   const token = localStorage.getItem('token')
+
+  const showToast = (message, type = 'success') => setToast({ message, type })
 
   useEffect(() => {
     if (!user || user.role !== 'admin') { navigate('/'); return }
@@ -32,14 +36,16 @@ export default function Admin() {
     const res = await fetch(`${API_URL}/associations/${id}/approuver`, {
       method: 'PUT', headers: { Authorization: `Bearer ${token}` }
     })
-    if (res.ok) { setPending(pending.filter(a => a.id !== id)); alert('✅ Association approuvée !') }
+    if (res.ok) { setPending(pending.filter(a => a.id !== id)); showToast('Association approuvée !') }
+    else showToast('Erreur lors de l\'approbation', 'error')
   }
 
   const handleRejeter = async (id) => {
     const res = await fetch(`${API_URL}/associations/${id}/rejeter`, {
       method: 'PUT', headers: { Authorization: `Bearer ${token}` }
     })
-    if (res.ok) { setPending(pending.filter(a => a.id !== id)); alert('❌ Association rejetée') }
+    if (res.ok) { setPending(pending.filter(a => a.id !== id)); showToast('Association rejetée', 'error') }
+    else showToast('Erreur lors du rejet', 'error')
   }
 
   const handleSupprimerProjet = async (id) => {
@@ -47,7 +53,8 @@ export default function Admin() {
     const res = await fetch(`${API_URL}/projets/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
     })
-    if (res.ok) setProjets(projets.filter(p => p.id !== id))
+    if (res.ok) { setProjets(projets.filter(p => p.id !== id)); showToast('Projet supprimé') }
+    else showToast('Erreur lors de la suppression', 'error')
   }
 
   const handleSupprimerAssociation = async (id, nom) => {
@@ -55,12 +62,8 @@ export default function Admin() {
     const res = await fetch(`${API_URL}/associations/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
     })
-    if (res.ok) {
-      setAssociations(associations.filter(a => a.id !== id))
-      alert('✅ Association supprimée')
-    } else {
-      alert('❌ Erreur lors de la suppression')
-    }
+    if (res.ok) { setAssociations(associations.filter(a => a.id !== id)); showToast('Association supprimée') }
+    else showToast('Erreur lors de la suppression', 'error')
   }
 
   const certifiees = associations.filter(a => a.badge === 'Certifiée')
@@ -72,6 +75,8 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
       <div className="bg-[#2d6a4f] text-white px-8 py-8">
         <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full mb-3 inline-block">ADMIN</span>
         <h1 className="text-3xl font-bold">Administration DiaspoConnect</h1>
@@ -174,8 +179,8 @@ export default function Admin() {
                               })
                               if (res.ok) {
                                 setAssociations(prev => prev.map(assoc => assoc.id === a.id ? { ...assoc, badge: newBadge } : assoc))
-                                alert(`✅ Badge mis à jour : ${newBadge}`)
-                              } else { alert('❌ Erreur') }
+                                showToast(`Badge mis à jour : ${newBadge}`)
+                              } else showToast('Erreur lors de la mise à jour', 'error')
                             }}
                             className="text-xs px-2 py-1 rounded-full border font-medium border-yellow-400 text-yellow-700 bg-white cursor-pointer">
                             <option value="Membre">🥉 Membre</option>

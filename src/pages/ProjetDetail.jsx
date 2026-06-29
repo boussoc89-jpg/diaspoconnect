@@ -18,6 +18,8 @@ export default function ProjetDetail() {
   const { id } = useParams()
   const [projet, setProjet] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [montantContrib, setMontantContrib] = useState('')
+const [contribMessage, setContribMessage] = useState('')
 
   useEffect(() => {
     fetch(`${API_URL}/projets/${id}`)
@@ -25,6 +27,34 @@ export default function ProjetDetail() {
       .then(data => { setProjet(data); setLoading(false) })
       .catch(() => setLoading(false))
   }, [id])
+
+  const handleSoutenir = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    setContribMessage('❌ Vous devez être connecté')
+    return
+  }
+  if (!montantContrib || montantContrib <= 0) {
+    setContribMessage('❌ Montant invalide')
+    return
+  }
+  const res = await fetch(`${API_URL}/projets/${id}/soutenir`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ montant: parseFloat(montantContrib) })
+  })
+  const data = await res.json()
+  if (res.ok) {
+    setContribMessage('✅ Contribution enregistrée !')
+    setProjet(data.projet)
+    setMontantContrib('')
+  } else {
+    setContribMessage('❌ ' + data.message)
+  }
+}
 
   if (loading) return <div className="text-center py-32 text-gray-400">Chargement...</div>
 
@@ -148,15 +178,30 @@ export default function ProjetDetail() {
           </div>
 
           {/* CTA */}
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
-            <h3 className="font-semibold text-primary mb-1">Soutenir ce projet</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              Contactez le porteur de projet pour apporter votre soutien.
-            </p>
-            <Link
-              to="/annuaire"
-              className="block w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary-dark transition-colors text-center"
-            >
+<div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+  <h3 className="font-semibold text-primary mb-1">Soutenir ce projet</h3>
+  <p className="text-gray-600 text-sm mb-4">
+    Indiquez le montant de votre contribution.
+  </p>
+  <input
+    type="number"
+    placeholder="Montant en €"
+    value={montantContrib}
+    onChange={e => setMontantContrib(e.target.value)}
+    className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm mb-3 focus:outline-none focus:border-[#2d6a4f]"
+  />
+  {contribMessage && (
+    <p className={`text-sm mb-3 font-medium ${contribMessage.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>
+      {contribMessage}
+    </p>
+  )}
+  <button
+    onClick={handleSoutenir}
+    className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary-dark transition-colors"
+  >
+    Confirmer ma contribution
+  </button>
+</div>
               Voir les associations
             </Link>
           </div>

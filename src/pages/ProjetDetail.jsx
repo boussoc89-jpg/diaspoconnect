@@ -19,7 +19,7 @@ export default function ProjetDetail() {
   const [projet, setProjet] = useState(null)
   const [loading, setLoading] = useState(true)
   const [montantContrib, setMontantContrib] = useState('')
-const [contribMessage, setContribMessage] = useState('')
+  const [contribMessage, setContribMessage] = useState('')
 
   useEffect(() => {
     fetch(`${API_URL}/projets/${id}`)
@@ -29,32 +29,23 @@ const [contribMessage, setContribMessage] = useState('')
   }, [id])
 
   const handleSoutenir = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    setContribMessage('❌ Vous devez être connecté')
-    return
+    const token = localStorage.getItem('token')
+    if (!token) { setContribMessage('❌ Vous devez être connecté'); return }
+    if (!montantContrib || montantContrib <= 0) { setContribMessage('❌ Montant invalide'); return }
+    const res = await fetch(`${API_URL}/projets/${id}/soutenir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ montant: parseFloat(montantContrib) })
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setContribMessage('✅ Contribution enregistrée !')
+      setProjet(data.projet)
+      setMontantContrib('')
+    } else {
+      setContribMessage('❌ ' + data.message)
+    }
   }
-  if (!montantContrib || montantContrib <= 0) {
-    setContribMessage('❌ Montant invalide')
-    return
-  }
-  const res = await fetch(`${API_URL}/projets/${id}/soutenir`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ montant: parseFloat(montantContrib) })
-  })
-  const data = await res.json()
-  if (res.ok) {
-    setContribMessage('✅ Contribution enregistrée !')
-    setProjet(data.projet)
-    setMontantContrib('')
-  } else {
-    setContribMessage('❌ ' + data.message)
-  }
-}
 
   if (loading) return <div className="text-center py-32 text-gray-400">Chargement...</div>
 
@@ -107,7 +98,6 @@ const [contribMessage, setContribMessage] = useState('')
 
         {/* Colonne gauche */}
         <div className="md:col-span-2 space-y-6">
-          {/* Description */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-3">Description du projet</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -115,7 +105,6 @@ const [contribMessage, setContribMessage] = useState('')
             </p>
           </div>
 
-          {/* Progression */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">Avancement du financement</h2>
             <div className="flex items-end justify-between mb-2">
@@ -143,7 +132,6 @@ const [contribMessage, setContribMessage] = useState('')
 
         {/* Colonne droite */}
         <div className="space-y-5">
-          {/* Infos */}
           <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="font-semibold text-gray-900">Informations</h3>
             <div className="flex items-center gap-3 text-sm text-gray-600">
@@ -178,32 +166,29 @@ const [contribMessage, setContribMessage] = useState('')
           </div>
 
           {/* CTA */}
-<div className="bg-green-50 border border-green-200 rounded-2xl p-5">
-  <h3 className="font-semibold text-primary mb-1">Soutenir ce projet</h3>
-  <p className="text-gray-600 text-sm mb-4">
-    Indiquez le montant de votre contribution.
-  </p>
-  <input
-    type="number"
-    placeholder="Montant en €"
-    value={montantContrib}
-    onChange={e => setMontantContrib(e.target.value)}
-    className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm mb-3 focus:outline-none focus:border-[#2d6a4f]"
-  />
-  {contribMessage && (
-    <p className={`text-sm mb-3 font-medium ${contribMessage.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>
-      {contribMessage}
-    </p>
-  )}
-  <button
-    onClick={handleSoutenir}
-    className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary-dark transition-colors"
-  >
-    Confirmer ma contribution
-  </button>
-</div>
-              Voir les associations
-            </Link>
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+            <h3 className="font-semibold text-primary mb-1">Soutenir ce projet</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Indiquez le montant de votre contribution.
+            </p>
+            <input
+              type="number"
+              placeholder="Montant en €"
+              value={montantContrib}
+              onChange={e => setMontantContrib(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm mb-3 focus:outline-none focus:border-[#2d6a4f]"
+            />
+            {contribMessage && (
+              <p className={`text-sm mb-3 font-medium ${contribMessage.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>
+                {contribMessage}
+              </p>
+            )}
+            <button
+              onClick={handleSoutenir}
+              className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary-dark transition-colors"
+            >
+              Confirmer ma contribution
+            </button>
           </div>
         </div>
       </div>

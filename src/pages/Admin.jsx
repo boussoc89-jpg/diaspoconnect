@@ -67,9 +67,20 @@ export default function Admin() {
   }
 
   const certifiees = associations.filter(a => a.badge === 'Certifiée')
-  const mois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin']
-  const valeurs = [10, 20, 25, 30, 38, associations.length || 45]
-  const max = Math.max(...valeurs)
+  const currentYear = new Date().getFullYear()
+const tousMois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
+const currentMonth = new Date().getMonth() // 0 = Jan
+const mois = tousMois.slice(0, currentMonth + 1)
+
+// Croissance cumulative réelle : nb d'associations créées jusqu'à la fin de chaque mois
+const valeurs = mois.map((_, i) => {
+  return associations.filter(a => {
+    if (!a.date_creation) return false
+    const d = new Date(a.date_creation)
+    return d.getFullYear() < currentYear || (d.getFullYear() === currentYear && d.getMonth() <= i)
+  }).length
+})
+const max = Math.max(...valeurs, 1) // éviter division par 0
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Chargement...</div>
 
@@ -124,16 +135,21 @@ export default function Admin() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
-              <h2 className="font-semibold text-gray-800 mb-4">Croissance de la plateforme — 2026</h2>
-              <div className="flex items-end gap-4" style={{ height: '120px' }}>
-                {mois.map((m, i) => (
-                  <div key={m} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                    <div className="w-full bg-yellow-400 rounded-t-md" style={{ height: `${(valeurs[i] / max) * 112}px` }} />
-                    <span className="text-xs text-gray-500">{m}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+  <h2 className="font-semibold text-gray-800 mb-4">Croissance de la plateforme — {currentYear}</h2>
+  {associations.length === 0 ? (
+    <p className="text-sm text-gray-400 text-center py-8">Pas encore assez de données pour afficher une courbe de croissance.</p>
+  ) : (
+    <div className="flex items-end gap-4" style={{ height: '120px' }}>
+      {mois.map((m, i) => (
+        <div key={m} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+          <span className="text-xs text-gray-600 font-medium">{valeurs[i]}</span>
+          <div className="w-full bg-yellow-400 rounded-t-md" style={{ height: `${(valeurs[i] / max) * 100}px` }} />
+          <span className="text-xs text-gray-500">{m}</span>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h2 className="font-semibold text-gray-800 mb-4">Associations actives ({associations.length})</h2>

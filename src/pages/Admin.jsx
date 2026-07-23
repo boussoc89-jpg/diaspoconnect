@@ -69,19 +69,25 @@ export default function Admin() {
   const certifiees = associations.filter(a => a.badge === 'Certifiée')
   const currentYear = new Date().getFullYear()
 const tousMois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
-const currentMonth = new Date().getMonth() // 0 = Jan
-const mois = tousMois.slice(0, currentMonth + 1)
+const currentMonth = new Date().getMonth()
 
-// Croissance cumulative réelle : nb d'associations créées jusqu'à la fin de chaque mois
+// Mois de la toute première association créée (si aucune, on démarre au mois courant)
+const datesCreation = associations.map(a => a.date_creation).filter(Boolean).map(d => new Date(d))
+const premierMois = datesCreation.length > 0
+  ? Math.min(...datesCreation.map(d => d.getFullYear() === currentYear ? d.getMonth() : 0))
+  : currentMonth
+
+const mois = tousMois.slice(premierMois, currentMonth + 1)
+
 const valeurs = mois.map((_, i) => {
+  const moisIndex = premierMois + i
   return associations.filter(a => {
     if (!a.date_creation) return false
     const d = new Date(a.date_creation)
-    return d.getFullYear() < currentYear || (d.getFullYear() === currentYear && d.getMonth() <= i)
+    return d.getFullYear() < currentYear || (d.getFullYear() === currentYear && d.getMonth() <= moisIndex)
   }).length
 })
-const max = Math.max(...valeurs, 1) // éviter division par 0
-
+const max = Math.max(...valeurs, 1)
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Chargement...</div>
 
   return (
